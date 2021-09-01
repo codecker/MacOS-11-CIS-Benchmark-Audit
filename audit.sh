@@ -2,7 +2,7 @@
 #
 # Mac OS 11 CIS Benchmark Audit - Level 1
 # Created by Kristian Decker
-# Run Audit as root to minimize permissions issues. Run $ sudo su
+# Run script as sudo
 ################################################################################################################
 
 # Audit Setup
@@ -30,40 +30,40 @@ USERS=$(dscl . list /Users | grep -v -e '_' -e 'root' -e 'nobody' -e 'daemon')
 echo "SECTION 1 Install Updates, Patches and Additional Security Software \n" >> $REPORT
 
 
-# 1.1 Verify all Apple-provided software is current 
 # TODO: Add date check to ensure the response is within the last 30 days
+# 1.1 Verify all Apple-provided software is current 
 echo "1.1 Verify all Apple-provided software is current. The response should be in the last 30 days" >> $REPORT
 defaults read /Library/Preferences/com.apple.SoftwareUpdate | grep -e LastFullSuccessfulDate >> $REPORT
-echo '\n' >> $REPORT
+echo "\n" >> $REPORT
 
 
 # 1.2 Enable Auto Update
 echo "1.2 Enable Auto Update" >> $REPORT
 AUDIT1_2=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled)
-echo "AutomaticCheckEnabled" >> $REPORT
+echo "\t""AutomaticCheckEnabled" >> $REPORT
 if [ $AUDIT1_2 = 1 ];
-  then echo "PASS - ENABLED \n" >> $REPORT
-  else echo "FAIL - DISABLED \n" >> $REPORT
+  then echo "\t""PASS - ENABLED \n" >> $REPORT
+  else echo "\t""FAIL - DISABLED \n" >> $REPORT
 fi
 
 
 # 1.3 Enable Download new updates when available
 echo "1.3 Enable Download new updates when available" >> $REPORT
 AUDIT1_3=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload)
-echo "AutomaticDownload" >> $REPORT
+echo "\t""AutomaticDownload" >> $REPORT
 if [ $AUDIT1_3 = 1 ];
-  then echo "PASS - ENABLED \n" >> $REPORT
-  else echo "FAIL - DISABLED \n" >> $REPORT
+  then echo "\t""PASS - ENABLED \n" >> $REPORT
+  else echo "\t""FAIL - DISABLED \n" >> $REPORT
 fi
 
 
 # 1.4 Enable app update installs
 echo "1.4 Enable app update installs" >> $REPORT
 AUDIT1_4=$(defaults read /Library/Preferences/com.apple.commerce AutoUpdate)
-echo "AutoUpdate" >> $REPORT
+echo "\t""AutoUpdate" >> $REPORT
 if [ $AUDIT1_4 = 1 ];
-  then echo "PASS - ENABLED \n" >> $REPORT
-  else echo "FAIL - DISABLED \n" >> $REPORT
+  then echo "\t""PASS - ENABLED \n" >> $REPORT
+  else echo "\t""FAIL - DISABLED \n" >> $REPORT
 fi
 
 
@@ -71,27 +71,27 @@ fi
 echo "1.5 Enable system data files and security updates install" >> $REPORT
 # First check
 AUDIT1_5a=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall)
-echo "ConfigDataInstall" >> $REPORT
+echo "\t""ConfigDataInstall" >> $REPORT
 if [ $AUDIT1_5a = 1 ];
-  then echo "PASS - ENABLED" >> $REPORT
-  else echo "FAIL - DISABLED" >> $REPORT
+  then echo "\t""PASS - ENABLED" >> $REPORT
+  else echo "\t""FAIL - DISABLED" >> $REPORT
 fi
 # Second Check
 AUDIT1_5b=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall)
-echo "CriticalUpdateInstall" >> $REPORT
+echo "\t""CriticalUpdateInstall" >> $REPORT
 if [ $AUDIT1_5b = 1 ];
-  then echo "PASS - ENABLED \n" >> $REPORT
-  else echo "FAIL - DISABLED \n" >> $REPORT
+  then echo "\t""PASS - ENABLED \n" >> $REPORT
+  else echo "\t""FAIL - DISABLED \n" >> $REPORT
 fi
 
 
 # 1.6 Enable macOS update installs
 echo "1.6 Enable macOS update installs" >> $REPORT
 AUDIT1_6=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates)
-echo "AutomaticallyInstallMacOSUpdates" >> $REPORT
+echo "\t""AutomaticallyInstallMacOSUpdates" >> $REPORT
 if [ $AUDIT1_6 = 1 ];
-  then echo "PASS - ENABLED \n" >> $REPORT
-  else echo "FAIL - DISABLED \n" >> $REPORT
+  then echo "\t""PASS - ENABLED \n" >> $REPORT
+  else echo "\t""AIL - DISABLED \n" >> $REPORT
 fi
 
 
@@ -106,7 +106,7 @@ echo "SECTION 2 System Preferences \n" >> $REPORT
 echo "2.1.1 Turn off Bluetooth, if no paired devices exist" >> $REPORT
 AUDIT2_1_1=$(defaults read /Library/Preferences/com.apple.Bluetooth ControllerPowerState)
 if [ $AUDIT2_1_1 = 0 ];
-  then echo "PASS - DISABLED \n" >> $REPORT
+  then echo "\t""PASS - DISABLED \n" >> $REPORT
   else 
   # If Bluetooth is enabled, check if there are paired devices
     BT=$(system_profiler SPBluetoothDataType | grep "Bluetooth:" -A 20 | grep Connectable)
@@ -119,29 +119,80 @@ if [ $AUDIT2_1_1 = 0 ];
 
     # If BT2 variable is null (-z) there are no paired Bluetooth devices, otherwise bluetooth devices have been paired
     if [ -z "$BT2" ];
-      then echo "FAIL - ENABLED with no paired Bluetooth devices \n" >> $REPORT
-      else echo "PASS - ENABLED with paired Bluetooth devices \n" >> $REPORT
+      then echo "\t""FAIL - ENABLED with no paired Bluetooth devices \n" >> $REPORT
+      else echo "\t""PASS - ENABLED with paired Bluetooth devices \n" >> $REPORT
     fi
 fi
 
 
 # 2.1.2 Show Bluetooth status in menu bar
 echo "2.1.2 Show Bluetooth status in menu bar" >> $REPORT
-echo "User accounts and Status" >> $REPORT
+echo "\t""User accounts and Status" >> $REPORT
 for i in $USERS
   do
     AUDIT2_1_2=$(sudo -u $i defaults -currentHost read com.apple.controlcenter.plist Bluetooth)
     if [ $AUDIT2_1_2 = 18 ]
-      then echo $i " PASS - ENABLED" >> $REPORT
-      else echo $i " FAIL - DISABLED" >> $REPORT
+      then echo "\t"$i " PASS - ENABLED" >> $REPORT
+      else echo "\t"$i " FAIL - DISABLED" >> $REPORT
     fi
   done
 echo "\n" >> $REPORT
 
-# 2.2.1 Enable "Set time and date automatically"
+
+# 2.2.1 Enable Set time and date automatically
 echo "2.2.1 Enable Set time and date automatically" >> $REPORT
 AUDIT2_2_1=$(systemsetup -getusingnetworktime)
 if [[ $AUDIT2_2_1 =~ "On" ]]
-  then echo "PASS - ENABLED \n" >> $REPORT
-  else echo "FAIL - DISABLED \n" >> $REPORT
+  then echo "\t""PASS - ENABLED \n" >> $REPORT
+  else echo "\t""FAIL - DISABLED \n" >> $REPORT
 fi
+
+
+# 2.2.2 Ensure time set is within appropriate limits 
+echo "2.2.2 Ensure time set is within appropriate limits" >> $REPORT
+# Get Network time server
+AUDIT2_2_2a=$(systemsetup -getnetworktimeserver)
+AUDIT2_2_2a_value=${AUDIT2_2_2a//"Network Time Server: "/}
+echo "\t""Network Time Server:" $AUDIT2_2_2a_value >> $REPORT
+
+# TODO: Calculate network time difference and provide PASS / FAIL Notification
+# Ensure Network time is within +/- 270 seconds
+echo "\tNTP_TOLERANCE = +/- 270" >> $REPORT
+AUDIT2_2_2b=$(sntp $AUDIT2_2_2a_value | grep +/-)
+echo "\t"$AUDIT2_2_2b"\n" >> $REPORT
+
+
+# TODO: FIX THIS AUDIT
+# 2.3.1 Set an inactivity interval of 20 minutes or less for the screen saver 
+# echo "2.3.1 Set an inactivity interval of 20 minutes or less for the screen saver" >> $REPORT
+# UUID=`ioreg -rd1 -c IOPlatformExpertDevice | grep "IOPlatformUUID" | sed -e 's/^.* "\(.*\)"$/\1/'`
+# for i in $USERS
+# do 
+#  echo $(defaults -currentHost read com.apple.screensaver idleTime)
+
+#   AUDIT2_3_1=$i/Library/Preferences/ByHost/com.apple.screensaver.$UUID 
+#   if [[ AUDIT2_3_1 =~ "exist" ]] 
+#     then echo "\t""FAIL - Default Inactivity Interval in use"
+#     else 
+#       # AUDIT2_3_1_idletime=$(defaults read $AUDIT2_3_1.plist idleTime)
+#       # echo $AUDIT2_3_1_idletime
+#   fi 
+# done
+
+
+# 2.3.2 Secure screen saver corners
+echo "2.3.2 Secure screen saver corners" >> $REPORT
+HOTCORNERS=("wvous-tl-corner" "wvous-bl-corner" "wvous-tr-corner" "wvous-br-corner ")
+
+for i in $USERS
+  do
+    for j in ${HOTCORNERS[@]}
+      do
+        AUDIT2_3_2=$(sudo -u $i defaults read com.apple.dock $j)
+        AUDIT2_3_2a=${j//"wvous-"/}
+        if [ $AUDIT2_3_2 = 6 ]
+          then echo "\t"$i" FAIL - Hot Corner '$AUDIT2_3_2a' Disable Screen Saver Configured" >> $REPORT
+          else echo "\t"$i" PASS - Hot Corner '$AUDIT2_3_2a' Disable Screen Saver Not Configured" >> $REPORT
+        fi
+      done
+  done
