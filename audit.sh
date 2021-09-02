@@ -22,6 +22,9 @@ echo "Mac OS CIS Benchmark ${TIMESTAMP} \n" >> $REPORT
 # List of all users. Removed all users starting with _, and daemon, nobody, and root users from list
 USERS=$(dscl . list /Users | grep -v -e '_' -e 'root' -e 'nobody' -e 'daemon')
 
+# List of hot corners
+HOTCORNERS=("wvous-tl-corner" "wvous-bl-corner" "wvous-tr-corner" "wvous-br-corner ")
+
 
 ################################################################################################################
 
@@ -165,6 +168,7 @@ echo "\t"$AUDIT2_2_2b"\n" >> $REPORT
 # TODO: FIX THIS AUDIT
 # 2.3.1 Set an inactivity interval of 20 minutes or less for the screen saver 
 # echo "2.3.1 Set an inactivity interval of 20 minutes or less for the screen saver" >> $REPORT
+# echo "\t""User accounts and Status" >> $REPORT
 # UUID=`ioreg -rd1 -c IOPlatformExpertDevice | grep "IOPlatformUUID" | sed -e 's/^.* "\(.*\)"$/\1/'`
 # for i in $USERS
 # do 
@@ -182,7 +186,8 @@ echo "\t"$AUDIT2_2_2b"\n" >> $REPORT
 
 # 2.3.2 Secure screen saver corners
 echo "2.3.2 Secure screen saver corners" >> $REPORT
-HOTCORNERS=("wvous-tl-corner" "wvous-bl-corner" "wvous-tr-corner" "wvous-br-corner ")
+echo "\t""User accounts and Status" >> $REPORT
+
 
 for i in $USERS
   do
@@ -197,8 +202,8 @@ for i in $USERS
         fi
       done
     if (( $AUDIT2_3_2_count >= 1 ))
-      then echo "\t"$i" FAIL - Hot Corner set with Disable Screen Saver" >> $REPORT
-      else echo "\t"$i" PASS - No Hot Corner set with Disable Screen Saver" >> $REPORT
+      then echo "\t"$i" FAIL - Hot Corner set to Disable Screen Saver" >> $REPORT
+      else echo "\t"$i" PASS - No Hot Corner set to Disable Screen Saver" >> $REPORT
       AUDIT2_3_2_count=0
     fi
   done
@@ -206,5 +211,32 @@ for i in $USERS
 echo "\n" >> $REPORT
 
 
-  # 2.3.3 Familiarize users with screen lock tools or corner to Start Screen Saver
-  # echo "Familiarize users with screen lock tools or corner to Start Screen Saver" >> $REPORT
+# 2.3.3 Familiarize users with screen lock tools or corner to Start Screen Saver
+echo "Familiarize users with screen lock tools or corner to Start Screen Saver" >> $REPORT
+echo "\t""User accounts and Status" >> $REPORT
+
+
+for i in $USERS
+  do
+    AUDIT2_3_2_count=0
+    echo $AUDIT2_3_3_count
+    for j in ${HOTCORNERS[@]}
+      do
+        AUDIT2_3_3=$(sudo -u $i defaults read com.apple.dock $j)
+        if [ $AUDIT2_3_3 = 5 ]
+          then AUDIT2_3_3_count=$((AUDIT2_3_2_count + 1))
+          echo $AUDIT2_3_3_count
+        fi
+        if [ $AUDIT2_3_3 = 10 ]
+          then AUDIT2_3_3_count=$((AUDIT2_3_2_count + 1))
+          echo $AUDIT2_3_3_count
+        fi
+      done
+    if (( $AUDIT2_3_3_count >= 1 ))
+      then echo "\t"$i" PASS - Hot Corner set to Start Screen Saver" >> $REPORT
+      else echo "\t"$i" FAIL - No Hot Corner set to Start Screen Saver" >> $REPORT
+      AUDIT2_3_3_count=0
+    fi
+  done
+
+echo "\n" >> $REPORT
