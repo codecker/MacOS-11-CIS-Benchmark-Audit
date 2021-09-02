@@ -132,8 +132,8 @@ for i in $USERS
   do
     AUDIT2_1_2=$(sudo -u $i defaults -currentHost read com.apple.controlcenter.plist Bluetooth)
     if [ $AUDIT2_1_2 = 18 ]
-      then echo "\t"$i " PASS - ENABLED" >> $REPORT
-      else echo "\t"$i " FAIL - DISABLED" >> $REPORT
+      then echo "\t"$i" PASS - ENABLED" >> $REPORT
+      else echo "\t"$i" FAIL - DISABLED" >> $REPORT
     fi
   done
 echo "\n" >> $REPORT
@@ -186,13 +186,25 @@ HOTCORNERS=("wvous-tl-corner" "wvous-bl-corner" "wvous-tr-corner" "wvous-br-corn
 
 for i in $USERS
   do
+    AUDIT2_3_2_count=0
+    echo $AUDIT2_3_2_count
     for j in ${HOTCORNERS[@]}
       do
         AUDIT2_3_2=$(sudo -u $i defaults read com.apple.dock $j)
-        AUDIT2_3_2a=${j//"wvous-"/}
         if [ $AUDIT2_3_2 = 6 ]
-          then echo "\t"$i" FAIL - Hot Corner '$AUDIT2_3_2a' Disable Screen Saver Configured" >> $REPORT
-          else echo "\t"$i" PASS - Hot Corner '$AUDIT2_3_2a' Disable Screen Saver Not Configured" >> $REPORT
+          then AUDIT2_3_2_count=$((AUDIT2_3_2_count + 1))
+          echo $AUDIT2_3_2_count
         fi
       done
+    if (( $AUDIT2_3_2_count >= 1 ))
+      then echo "\t"$i" FAIL - Hot Corner set with Disable Screen Saver" >> $REPORT
+      else echo "\t"$i" PASS - No Hot Corner set with Disable Screen Saver" >> $REPORT
+      AUDIT2_3_2_count=0
+    fi
   done
+
+echo "\n" >> $REPORT
+
+
+  # 2.3.3 Familiarize users with screen lock tools or corner to Start Screen Saver
+  # echo "Familiarize users with screen lock tools or corner to Start Screen Saver" >> $REPORT
