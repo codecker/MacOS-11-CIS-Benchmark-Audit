@@ -240,3 +240,12 @@ for i in $USERS
   done
 
 echo "\n" >> $REPORT
+
+# 2.4.1 Disable Remote Apple Events
+echo "2.4.1 Disable Remote Apple Events" >> $REPORT
+
+AUDIT2_4_1=$(systemsetup -getremoteappleevents)
+if [[ $AUDIT2_4_1 =~ "Off" ]] 
+  then echo "\t""PASS - DISABLED \n" >> $REPORT
+  else echo "\t""FAIL - ENABLED \n" >> $REPORT
+fi
