@@ -238,7 +238,6 @@ for i in $USERS
       AUDIT2_3_3_count=0
     fi
   done
-
 echo "\n" >> $REPORT
 
 
@@ -258,9 +257,19 @@ AUDIT2_4_2=/Library/Preferences/SystemConfiguration/com.apple.nat
 if test -f "$AUDIT2_4_2"
   then 
     if ( defaults read /Library/Preferences/SystemConfiguration/com.apple.nat | grep -i = Enabled )
-      then echo "\t""FAIL - ENABLED" >> $REPORT
+      then echo "\t""FAIL - ENABLED \n" >> $REPORT
     fi
-  else echo "\t""PASS - DISABLED" >> $REPORT
+  else echo "\t""PASS - DISABLED \n" >> $REPORT
 fi
 
 
+# 2.4.3 Disable Screen Sharing
+echo "2.4.3 Disable Screen Sharing" >> $REPORT
+AUDIT2_4_3=launchctl print-disabled system | grep -c '"com.apple.screensharing" => true'
+if ( $AUDIT2_4_3 = 1 )
+  then echo "\t""FAIL - ENABLED \n" >> $REPORT
+  else echo "\t""PASS - DISABLED \n" >> $REPORT
+fi
+
+
+# 2.4.4 Disable Printer Sharing
