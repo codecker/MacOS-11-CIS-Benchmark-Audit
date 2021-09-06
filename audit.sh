@@ -241,6 +241,7 @@ for i in $USERS
 
 echo "\n" >> $REPORT
 
+
 # 2.4.1 Disable Remote Apple Events
 echo "2.4.1 Disable Remote Apple Events" >> $REPORT
 
@@ -249,3 +250,17 @@ if [[ $AUDIT2_4_1 =~ "Off" ]]
   then echo "\t""PASS - DISABLED \n" >> $REPORT
   else echo "\t""FAIL - ENABLED \n" >> $REPORT
 fi
+
+
+# 2.4.2 Disable Internet Sharing
+echo "2.4.2 Disable Internet Sharing" >> $REPORT
+AUDIT2_4_2=/Library/Preferences/SystemConfiguration/com.apple.nat 
+if test -f "$AUDIT2_4_2"
+  then 
+    if ( defaults read /Library/Preferences/SystemConfiguration/com.apple.nat | grep -i = Enabled )
+      then echo "\t""FAIL - ENABLED" >> $REPORT
+    fi
+  else echo "\t""PASS - DISABLED" >> $REPORT
+fi
+
+
