@@ -265,7 +265,7 @@ fi
 
 # 2.4.3 Disable Screen Sharing
 echo "2.4.3 Disable Screen Sharing" >> $REPORT
-AUDIT2_4_3=launchctl print-disabled system | grep -c '"com.apple.screensharing" => true'
+AUDIT2_4_3=$(launchctl print-disabled system | grep -c '"com.apple.screensharing" => true')
 if ( $AUDIT2_4_3 = 1 )
   then echo "\t""FAIL - ENABLED \n" >> $REPORT
   else echo "\t""PASS - DISABLED \n" >> $REPORT
@@ -273,3 +273,18 @@ fi
 
 
 # 2.4.4 Disable Printer Sharing
+echo "2.4.4 Disable Printer Sharing" >> $REPORT
+AUDIT2_4_4=$(cupsctl | grep _share_printers | cut -d'=' -f2)
+if ( $AUDIT2_4_4 = 1 )
+  then echo "\t""FAIL - ENABLED \n" >> $REPORT
+  else echo "\t""PASS - DISABLED \n" >> $REPORT
+fi
+
+
+# 2.4.5 Disable Remote Login
+echo "2.4.5 Disable Remote Login" >> $REPORT
+AUDIT2_4_5=$(systemsetup -getremotelogin)
+if [[ $AUDIT2_4_5 =~ "Off" ]]
+  then echo "\t""PASS - DISABLED \n" >> $REPORT
+  else echo "\t""FAIL - ENABLED \n" >> $REPORT
+fi
