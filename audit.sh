@@ -212,24 +212,20 @@ echo "\n" >> $REPORT
 
 
 # 2.3.3 Familiarize users with screen lock tools or corner to Start Screen Saver
-echo "Familiarize users with screen lock tools or corner to Start Screen Saver" >> $REPORT
+echo "2.3.3 Familiarize users with screen lock tools or corner to Start Screen Saver" >> $REPORT
 echo "\t""User accounts and Status" >> $REPORT
-
 
 for i in $USERS
   do
-    AUDIT2_3_2_count=0
+    AUDIT2_3_3_count=0
     echo $AUDIT2_3_3_count
     for j in ${HOTCORNERS[@]}
       do
         AUDIT2_3_3=$(sudo -u $i defaults read com.apple.dock $j)
         if [ $AUDIT2_3_3 = 5 ]
           then AUDIT2_3_3_count=$((AUDIT2_3_2_count + 1))
-          echo $AUDIT2_3_3_count
-        fi
-        if [ $AUDIT2_3_3 = 10 ]
+        elif [ $AUDIT2_3_3 = 10 ]
           then AUDIT2_3_3_count=$((AUDIT2_3_2_count + 1))
-          echo $AUDIT2_3_3_count
         fi
       done
     if (( $AUDIT2_3_3_count >= 1 ))
@@ -266,7 +262,7 @@ fi
 # 2.4.3 Disable Screen Sharing
 echo "2.4.3 Disable Screen Sharing" >> $REPORT
 AUDIT2_4_3=$(launchctl print-disabled system | grep -c '"com.apple.screensharing" => true')
-if ( $AUDIT2_4_3 = 1 )
+if [ $AUDIT2_4_3 = 1 ]
   then echo "\t""FAIL - ENABLED \n" >> $REPORT
   else echo "\t""PASS - DISABLED \n" >> $REPORT
 fi
@@ -275,7 +271,7 @@ fi
 # 2.4.4 Disable Printer Sharing
 echo "2.4.4 Disable Printer Sharing" >> $REPORT
 AUDIT2_4_4=$(cupsctl | grep _share_printers | cut -d'=' -f2)
-if ( $AUDIT2_4_4 = 1 )
+if [ $AUDIT2_4_4 = 1 ]
   then echo "\t""FAIL - ENABLED \n" >> $REPORT
   else echo "\t""PASS - DISABLED \n" >> $REPORT
 fi
@@ -285,6 +281,15 @@ fi
 echo "2.4.5 Disable Remote Login" >> $REPORT
 AUDIT2_4_5=$(systemsetup -getremotelogin)
 if [[ $AUDIT2_4_5 =~ "Off" ]]
+  then echo "\t""PASS - DISABLED \n" >> $REPORT
+  else echo "\t""FAIL - ENABLED \n" >> $REPORT
+fi
+
+
+# 2.4.6 Disable DVD or CD Sharing 
+echo "2.4.6 Disable DVD or CD Sharing" >> $REPORT
+AUDIT2_4_6=$(launchctl print-disabled system | grep -c '"com.apple.ODSAgent" => true')
+if [ $AUDIT2_4_6 = 1 ]
   then echo "\t""PASS - DISABLED \n" >> $REPORT
   else echo "\t""FAIL - ENABLED \n" >> $REPORT
 fi
