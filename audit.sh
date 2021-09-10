@@ -134,7 +134,7 @@ echo "\t""User accounts and Status" >> $REPORT
 for i in $USERS
   do
     AUDIT2_1_2=$(sudo -u $i defaults -currentHost read com.apple.controlcenter.plist Bluetooth)
-    if [ $AUDIT2_1_2 = 18 ]
+    if [ "$AUDIT2_1_2" = 18 ]
       then echo "\t"$i" PASS - ENABLED" >> $REPORT
       else echo "\t"$i" FAIL - DISABLED" >> $REPORT
     fi
@@ -160,7 +160,7 @@ echo "\t""Network Time Server:" $AUDIT2_2_2a_value >> $REPORT
 
 # TODO: Calculate network time difference and provide PASS / FAIL Notification
 # Ensure Network time is within +/- 270 seconds
-echo "\tNTP_TOLERANCE = +/- 270" >> $REPORT
+echo "\t""NTP_TOLERANCE = +/- 270" >> $REPORT
 AUDIT2_2_2b=$(sntp $AUDIT2_2_2a_value | grep +/-)
 echo "\t"$AUDIT2_2_2b"\n" >> $REPORT
 
@@ -188,17 +188,14 @@ echo "\t"$AUDIT2_2_2b"\n" >> $REPORT
 echo "2.3.2 Secure screen saver corners" >> $REPORT
 echo "\t""User accounts and Status" >> $REPORT
 
-
 for i in $USERS
   do
     AUDIT2_3_2_count=0
-    echo $AUDIT2_3_2_count
     for j in ${HOTCORNERS[@]}
       do
         AUDIT2_3_2=$(sudo -u $i defaults read com.apple.dock $j)
-        if [ $AUDIT2_3_2 = 6 ]
+        if [ "$AUDIT2_3_2" = 6 ]
           then AUDIT2_3_2_count=$((AUDIT2_3_2_count + 1))
-          echo $AUDIT2_3_2_count
         fi
       done
     if (( $AUDIT2_3_2_count >= 1 ))
@@ -218,13 +215,12 @@ echo "\t""User accounts and Status" >> $REPORT
 for i in $USERS
   do
     AUDIT2_3_3_count=0
-    echo $AUDIT2_3_3_count
     for j in ${HOTCORNERS[@]}
       do
         AUDIT2_3_3=$(sudo -u $i defaults read com.apple.dock $j)
-        if [ $AUDIT2_3_3 = 5 ]
+        if [ "$AUDIT2_3_3" = 5 ]
           then AUDIT2_3_3_count=$((AUDIT2_3_2_count + 1))
-        elif [ $AUDIT2_3_3 = 10 ]
+        elif [ "$AUDIT2_3_3" = 10 ]
           then AUDIT2_3_3_count=$((AUDIT2_3_2_count + 1))
         fi
       done
@@ -293,3 +289,8 @@ if [ $AUDIT2_4_6 = 1 ]
   then echo "\t""PASS - DISABLED \n" >> $REPORT
   else echo "\t""FAIL - ENABLED \n" >> $REPORT
 fi
+
+
+# 2.4.7 Disable Bluetooth Sharing
+echo "2.4.7 Disable Bluetooth Sharing" >> $REPORT
+echo "\t""User accounts and Status" >> $REPORT
